@@ -37,6 +37,7 @@ function da_display_ems_menu()
     add_submenu_page('emp-list', 'Employee List', 'Employee List', 'manage_options', 'emp-list', 'da_ems_list_callback');
     add_submenu_page('emp-list', 'Add Employee', 'Add Employee', 'manage_options', 'add-emp', 'da_ems_add_callback');
     add_submenu_page(null, 'Update Employee', 'Update Employee', 'manage_options', 'update-emp', 'da_emp_update_call');
+    add_submenu_page(null, 'Delete Employee', 'Delete Employee', 'manage_options', 'delete-emp', 'da_emp_delete_call');
 }
 
 function da_ems_add_callback()
@@ -171,4 +172,34 @@ function da_emp_update_call()
         <button type="submit" name="update">Update</button>
     </p>
 </form>
+<?php }
+
+function da_emp_delete_call()
+{
+    global $wpdb;
+    $table_name = $wpdb->prefix . 'ems';
+    $id = isset($_REQUEST['id']) ? intval($_REQUEST['id']) : "";
+    if (isset($_REQUEST['delete'])) {
+        if ($_REQUEST['conf'] == 'yes') {
+            $row_exits = $wpdb->get_row($wpdb->prepare("SELECT * FROM $table_name WHERE id = %d", $id), ARRAY_A);
+            if (count($row_exits) > 0) {
+                $wpdb->delete("$table_name", array('id' => $id,));
+            }
+        } ?>
+<script>
+location.href = "<?php echo site_url(); ?>/wp-admin/admin.php?page=emp-list";
+</script>
+<?php } ?>
+<form method="post">
+    <p>
+        <label>Are you sure want delete?</label><br>
+        <input type="radio" name="conf" value="yes">Yes
+        <input type="radio" name="conf" value="no" checked>No
+    </p>
+    <p>
+        <button type="submit" name="delete">Delete</button>
+        <input type="hidden" name="id" value="<?php echo $id; ?>">
+    </p>
+</form>
+
 <?php }
