@@ -94,7 +94,39 @@ function da_ems_add_callback()
 </form>
 <?php }
 
-function da_ems_list_callback(){
+function da_ems_list_callback()
+{
+    global $wpdb;
+    $table_name = $wpdb->prefix . 'ems';
+    $employee_list = $wpdb->get_results($wpdb->prepare("select * FROM $table_name", ""), ARRAY_A);
+    if (count($employee_list) > 0): ?>
+<div style="margin-top: 40px;">
+    <table border="1" cellpadding="10">
+        <tr>
+            <th>S.No.</th>
+            <th>EMP ID</th>
+            <th>Name</th>
+            <th>Email</th>
+            <th>Department</th>
+            <th>Action</th>
+        </tr>
+        <?php $i = 1;
+                foreach ($employee_list as $index => $employee): ?>
+        <tr>
+            <td><?php echo $i++; ?></td>
+            <td><?php echo $employee['emp_id']; ?></td>
+            <td><?php echo $employee['emp_name']; ?></td>
+            <td><?php echo $employee['emp_email']; ?></td>
+            <td><?php echo $employee['emp_dept']; ?></td>
+            <td>
+                <a href="admin.php?page=update-emp&id=<?php echo $employee['id']; ?>">Edit</a>
+                <a href="admin.php?page=delete-emp&id=<?php echo $employee['id']; ?>">Delete</a>
+            </td>
 
-    echo "<h2>Employee List</h2>";
+        </tr>
+        <?php endforeach; ?>
+    </table>
+
+</div>
+<?php else:echo "<h2>Employee Record Not Found</h2>";endif;
 }
