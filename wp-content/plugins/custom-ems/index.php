@@ -36,7 +36,7 @@ function da_display_ems_menu()
     add_menu_page('EMS', 'EMS', 'manage_options', 'emp-list', 'da_ems_list_callback');
     add_submenu_page('emp-list', 'Employee List', 'Employee List', 'manage_options', 'emp-list', 'da_ems_list_callback');
     add_submenu_page('emp-list', 'Add Employee', 'Add Employee', 'manage_options', 'add-emp', 'da_ems_add_callback');
-
+    add_submenu_page(null, 'Update Employee', 'Update Employee', 'manage_options', 'update-emp', 'da_emp_update_call');
 }
 
 function da_ems_add_callback()
@@ -130,3 +130,45 @@ function da_ems_list_callback()
 </div>
 <?php else:echo "<h2>Employee Record Not Found</h2>";endif;
 }
+
+function da_emp_update_call()
+{
+    global $wpdb;
+    $table_name = $wpdb->prefix . 'ems';
+    $msg = '';
+    $id = isset($_REQUEST['id']) ? intval($_REQUEST['id']) : "";
+    if (isset($_REQUEST['update'])) {
+        if (!empty($id)) {
+            $wpdb->update("$table_name", ["emp_id" => $_REQUEST['emp_id'], 'emp_name' => $_REQUEST['emp_name'], 'emp_email' => $_REQUEST['emp_email'], 'emp_dept' => $_REQUEST['emp_dept']], ["id" => $id]);
+            $msg = 'Data Updated Successfully';
+        }
+    }
+    $employee_details = $wpdb->get_row($wpdb->prepare("SELECT * FROM $table_name where id = %d", $id), ARRAY_A); ?>
+<h4><?php echo $msg; ?></h4>
+<form method="post">
+    <p>
+        <label>EMP ID</label>
+        <input type="text" name="emp_id" placeholder="Enter ID" value="<?php echo $employee_details['emp_id']; ?>"
+            required>
+    </p>
+
+    <p>
+        <label>Name</label>
+        <input type="text" name="emp_name" placeholder="Enter Name" value="<?php echo $employee_details['emp_name']; ?>"
+            required>
+    </p>
+    <p>
+        <label>Email</label>
+        <input type="email" name="emp_email" placeholder="Enter Email"
+            value="<?php echo $employee_details['emp_email']; ?>" required>
+    </p>
+    <p>
+        <label>Department</label>
+        <input type="text" name="emp_dept" placeholder="Enter Department"
+            value="<?php echo $employee_details['emp_dept']; ?>" required>
+    </p>
+    <p>
+        <button type="submit" name="update">Update</button>
+    </p>
+</form>
+<?php }
